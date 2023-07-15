@@ -9,6 +9,4 @@ import javax.persistence.EntityManager;
 @Repository
 public class ClientesRepository {
 
-    @Autowired
-    private EntityManager entityManager;
 }
