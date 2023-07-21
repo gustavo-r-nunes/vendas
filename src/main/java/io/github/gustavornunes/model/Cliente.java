@@ -1,6 +1,7 @@
 package io.github.gustavornunes.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,14 +9,12 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
-
-
+@Entity
+@Table(name = "cliente")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "cliente")
 public class Cliente {
 
     @Id
@@ -25,7 +24,12 @@ public class Cliente {
 
     private String nome;
 
-    @OneToMany(mappedBy = "cliente")
+    @Column(name = "cpf", length = 11)
+    private String cpf;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY)
     private Set<Pedido> pedidos;
 
 }
+

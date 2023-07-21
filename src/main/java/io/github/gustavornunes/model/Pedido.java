@@ -1,9 +1,6 @@
 package io.github.gustavornunes.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -11,11 +8,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "table")
+@Table(name = "pedido")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Pedido {
 
     @Id
