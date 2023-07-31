@@ -2,6 +2,8 @@ package io.github.gustavornunes.service.iml;
 
 import io.github.gustavornunes.dto.ItemPedidoDTO;
 import io.github.gustavornunes.dto.PedidoDTO;
+import io.github.gustavornunes.enums.StatusPedido;
+import io.github.gustavornunes.exception.PedidoNaoEncontradoException;
 import io.github.gustavornunes.exception.RegraNegocioException;
 import io.github.gustavornunes.model.Cliente;
 import io.github.gustavornunes.model.ItemPedido;
@@ -48,6 +50,7 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setDataPedido(LocalDate.now());
         pedido.setTotal(dto.getTotal());
         pedido.setCliente(cliente);
+        pedido.setStatus(StatusPedido.REALIZADO);
 
         List<ItemPedido> itensPedido = processarItens(pedido, dto.getItens());
         repository.save(pedido);
@@ -60,6 +63,16 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     public Optional<Pedido> obterPedidoCompleto(Integer idPedido) {
         return repository.findByIdFetchItens(idPedido);
+    }
+
+    @Override
+    @Transactional
+    public void atualizaStatus(Integer id, StatusPedido status) {
+        repository.findById(id)
+                .map(pedido -> {
+                    pedido.setStatus(status);
+                    return repository.save(pedido);
+                }).orElseThrow(() -> new PedidoNaoEncontradoException());
     }
 
     private List<ItemPedido> processarItens(Pedido pedido, List<ItemPedidoDTO> itens){

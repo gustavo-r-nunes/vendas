@@ -1,22 +1,20 @@
 package io.github.gustavornunes.controller;
 
+import io.github.gustavornunes.dto.AtualizacaoStatusPedidoDTO;
 import io.github.gustavornunes.dto.InformacaoPedidoDTO;
 import io.github.gustavornunes.dto.InformacoesPedidoDTO;
 import io.github.gustavornunes.dto.PedidoDTO;
-import io.github.gustavornunes.model.Cliente;
+import io.github.gustavornunes.enums.StatusPedido;
 import io.github.gustavornunes.model.ItemPedido;
 import io.github.gustavornunes.model.Pedido;
-import io.github.gustavornunes.repository.PedidoRepository;
 import io.github.gustavornunes.service.PedidoService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +28,7 @@ public class PedidoController {
     private PedidoService service;
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Integer save(@RequestBody PedidoDTO dto){
+    public Integer save(@RequestBody @Valid PedidoDTO dto){
         Pedido pedido = service.salvar(dto);
         return pedido.getId();
     }
@@ -42,6 +40,12 @@ public class PedidoController {
                 .map(p -> converter(p) )
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
     }
+    @PatchMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateStatus(@RequestBody AtualizacaoStatusPedidoDTO dto, @PathVariable Integer id){
+        String novoStatus = dto.getNovoStatus();
+        service.atualizaStatus(id, StatusPedido.valueOf(novoStatus));
+    }
 
     private InformacoesPedidoDTO converter (Pedido pedido){
 
@@ -52,6 +56,7 @@ public class PedidoController {
                 .nomeCliente(pedido.getCliente().getNome())
                 .total(pedido.getTotal())
                 .items(converter(pedido.getItens()))
+                .status(pedido.getStatus().name())
                 .build();
 
     }
