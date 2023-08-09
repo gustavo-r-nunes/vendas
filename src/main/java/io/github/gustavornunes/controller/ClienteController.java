@@ -2,6 +2,7 @@ package io.github.gustavornunes.controller;
 
 import io.github.gustavornunes.model.Cliente;
 import io.github.gustavornunes.repository.ClienteRepository;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -15,20 +16,27 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
+@Api("Api clientes")
 public class ClienteController {
 
     @Autowired
     private ClienteRepository repository;
 
     @GetMapping("/{id}")
-    public Cliente getClienteById(@PathVariable Integer id){
+    @ApiOperation("Obter detalhes de cliente")
+    @ApiResponses({ @ApiResponse(code = 200, message = "Cliente encontrado"),
+                    @ApiResponse(code = 404, message = "cliente nao encontado para o id informado")
+    })
+    public Cliente getClienteById(@PathVariable @ApiParam("id do cliente") Integer id){
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
-
-
 
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("salvar cliente")
+    @ApiResponses({ @ApiResponse(code = 201, message = "Cliente salvo com sucesso"),
+            @ApiResponse(code = 400, message = "Erro de validacao")
+    })
     public Cliente save(@RequestBody @Valid Cliente cliente){
         return repository.save(cliente);
     }
